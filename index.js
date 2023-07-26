@@ -37,9 +37,15 @@ function handlePostRequest(request, response) {
     request.on('end', async () => {
         const parsedBody = JSON.parse(body);
         const responseData = { message: 'Received data successfully! (POST)', data: parsedBody };
-        // Add CREATOR_NAME to clubMembers
-        parsedBody.clubMembers.push(CREATOR_NAME);
-        const parsedBodyWithCreatorName = JSON.stringify(parsedBody, null, 2);
+        /*
+        * JS passes objects and arrays by reference. 
+        * To mitigate, create deep copy of parsedBody as below.
+        */
+        const parsedBodyCopy = JSON.parse(JSON.stringify(parsedBody));
+
+        // Add CREATOR_NAME to clubMembers in parsedBodyCopy
+        parsedBodyCopy.clubMembers.push(CREATOR_NAME);
+        const parsedBodyWithCreatorName = JSON.stringify(parsedBodyCopy, null, 2);
 
         try {
             await fs.writeFile('./club.json', parsedBodyWithCreatorName);
